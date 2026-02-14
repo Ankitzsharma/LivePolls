@@ -10,7 +10,10 @@ const app = express();
 const server = http.createServer(app);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || '*',
+  methods: ['GET', 'POST'],
+}));
 app.use(express.json());
 
 // Socket.IO Setup
@@ -31,6 +34,16 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/poll-app')
 
 // Routes
 app.use('/api/polls', pollRoutes);
+
+// Health Check
+app.get('/health', (req, res) => {
+  const mongoState = mongoose.connection.readyState; // 0=disconnected,1=connected,2=connecting,3=disconnecting
+  res.json({
+    status: 'ok',
+    mongo: mongoState,
+    clientUrl: process.env.CLIENT_URL || null,
+  });
+});
 
 // Socket.IO Events
 io.on('connection', (socket) => {
