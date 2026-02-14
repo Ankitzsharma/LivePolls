@@ -7,15 +7,28 @@ const { nanoid } = require('nanoid');
 router.post('/', async (req, res) => {
   try {
     const { question, options } = req.body;
+    const q = (question || '').trim();
+    const rawOptions = Array.isArray(options) ? options : [];
+    const trimmedOptions = rawOptions.map(o => String(o || '').trim()).filter(o => o.length > 0);
+    const uniqueOptions = [...new Set(trimmedOptions)];
 
-    if (!question || !options || options.length < 2) {
-      return res.status(400).json({ error: 'Question and at least 2 options are required.' });
+    if (!q) {
+      return res.status(400).json({ error: 'Question is required.' });
+    }
+    if (uniqueOptions.length < 2) {
+      return res.status(400).json({ error: 'Provide at least two non-empty options.' });
+    }
+    if (uniqueOptions.length > 50) {
+      return res.status(400).json({ error: 'Too many options.' });
+    }
+    if (q.length > 200) {
+      return res.status(400).json({ error: 'Question is too long.' });
     }
 
     const newPoll = new Poll({
       _id: nanoid(8),
-      question,
-      options: options.map((opt, index) => ({
+      question: q,
+      options: uniqueOptions.map((opt, index) => ({
         id: index,
         text: opt,
         votes: 0
@@ -26,8 +39,9 @@ router.post('/', async (req, res) => {
     await newPoll.save();
     res.status(201).json(newPoll);
   } catch (err) {
-    console.error('Error creating poll:', err);
-    res.status(500).json({ error: 'Server error' });
+    const message = err?.message || 'Server error';
+    console.error('Error creating poll:', message);
+    res.status(500).json({ error: message });
   }
 });
 
@@ -60,7 +74,7 @@ router.post('/:id/vote', async (req, res) => {
     const { optionId } = req.body;
     const pollId = req.params.id;
     const clientIp = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    const browserId = req.headers['x-browser-id']; 
+    const browserId = req.headers['x-browser-id'];
 
     if (!browserId) {
       return res.status(400).json({ error: 'Browser ID is required.' });

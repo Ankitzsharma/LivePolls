@@ -395,6 +395,19 @@ input[type="text"]::placeholder {
   animation: pulse-bg 1.5s infinite;
 }
 
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .skeleton.title {
   height: 32px;
   width: 70%;

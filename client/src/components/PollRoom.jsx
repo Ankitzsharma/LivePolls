@@ -10,7 +10,6 @@ const PollRoom = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hasVoted, setHasVoted] = useState(false);
-  const [socket, setSocket] = useState(null);
   const [isVoting, setIsVoting] = useState(false);
   const [message, setMessage] = useState(null); // { type: 'info'|'error', text: string }
   const [selectedOptionId, setSelectedOptionId] = useState(null);
@@ -27,7 +26,6 @@ const PollRoom = () => {
     // Initialize Socket
     const serverUrl = import.meta.env.VITE_SERVER_URL || 'https://livepolls-p2z9.onrender.com';
     const newSocket = io(serverUrl);
-    setSocket(newSocket);
 
     // Fetch Poll Data
     const fetchPoll = async () => {
