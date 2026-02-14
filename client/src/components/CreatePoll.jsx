@@ -48,7 +48,7 @@ const CreatePoll = () => {
       const serverUrl =
         import.meta.env.VITE_API_URL ||
         import.meta.env.VITE_SERVER_URL ||
-        'http://localhost:5000';
+        'https://livepolls-p2z9.onrender.com';
 
       const res = await axios.post(`${serverUrl}/api/polls`, {
         question,

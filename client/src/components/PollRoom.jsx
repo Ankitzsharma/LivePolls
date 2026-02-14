@@ -25,7 +25,7 @@ const PollRoom = () => {
     }
 
     // Initialize Socket
-    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'https://livepolls-p2z9.onrender.com';
     const newSocket = io(serverUrl);
     setSocket(newSocket);
 
@@ -74,7 +74,7 @@ const PollRoom = () => {
     if (isVoting) return;
 
     try {
-      const serverUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+      const serverUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_SERVER_URL || 'https://livepolls-p2z9.onrender.com';
       const browserId = localStorage.getItem('browserId');
       setIsVoting(true);
       setMessage(null);
