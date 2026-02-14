@@ -44,9 +44,29 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/poll-app')
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB Connection Error:', err));
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/poll-app', {
+      serverSelectionTimeoutMS: 5000, // Fail quickly if no connection
+      socketTimeoutMS: 45000,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (err) {
+    console.error('MongoDB Connection Error:', err);
+    // Don't exit process, allow retry or server to stay up for health checks
+  }
+};
+
+connectDB();
+
+// Handle connection errors after initial connection
+mongoose.connection.on('error', err => {
+  console.error('MongoDB Runtime Error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB Disconnected');
+});
 
 // Routes
 app.use('/api/polls', pollRoutes);
